@@ -26,6 +26,37 @@ const cadastrarCliente = async (req, res) => {
     }
 }
 
+const listarClientes = async (req, res) => {
+    const { authorization } = req.headers
+
+    if(!authorization){
+        return res.status(401).json({mensagem: 'Não autorizado'})
+    }
+
+    try {
+
+        const token = authorization.replace('Bearer ', '').trim()
+        const { id } = jwt.verify(token, senhaHash)
+
+        const usuarioencontrado = await knex('usuario').where({id}).first()
+
+        if(!usuarioencontrado){
+            return res.status(404).json({mensagem: 'Usuario não encontrado' })
+        }
+
+        const clientes = await knex('clientes')
+
+        console.log(clientes)
+
+        return res.status(200).json(clientes)
+
+    }catch (erro){
+        return res.status(400).json(erro.message)
+    }
+
+}
+
 module.exports = {
-    cadastrarCliente
+    cadastrarCliente,
+    listarClientes
 }
