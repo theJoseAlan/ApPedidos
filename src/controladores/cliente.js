@@ -133,9 +133,9 @@ const excluirCliente = async (req, res) => {
             return res.status(404).json({mensagem: 'Cliente não encontrado'})
         }
 
-        const usuario = await knex('clientes').delete().where({id})
+        const cliente = await knex('clientes').delete().where({id})
 
-        if(!usuario){
+        if(!cliente){
             return res.status(400).json({mensagem: 'Não foi posssível excluir o cliente'})
         }
 

@@ -5,6 +5,7 @@ const { verificaLogin } = require('../filtros/verificalogin')
 const login = require('../controladores/login')
 const cliente = require('../controladores/cliente')
 const produto = require('../controladores/produto')
+const pedido = require('../controladores/pedido')
 
 const rotas = express()
 
@@ -26,5 +27,10 @@ rotas.put('/produto/:id', produto.atualizarProduto)
 rotas.delete('/produto/:id', produto.excluirProduto)
 rotas.get('/produto/:nome', produto.obterProdutoPorNome)
 
+rotas.post('/pedido', pedido.cadastrarPedido)
+rotas.get('/pedido', pedido.listarPedidos)
+rotas.get('/pedido/:cliente_id', pedido.listarPedidosPorCliente)
+rotas.put('/pedido/:id', pedido.atualizarPedido)
+rotas.delete('/pedido/:id', pedido.excluirPedido)
 
 module.exports = rotas
