@@ -56,7 +56,48 @@ const listarClientes = async (req, res) => {
 
 }
 
+const obterClientePorNome = async (req, res) => {
+
+    const { nome } = req.params
+
+    try {
+        const cliente = await knex('clientes').where({nome}).first()
+
+        if(!cliente){
+            return res.status(404).json({mensagem: 'Cliente não encontrado'})
+        }
+
+        return res.status(200).json(cliente)
+
+    }catch (erro){
+        return res.status(400).json(erro.message)
+    }
+
+}
+
+const listarClientesPorEndereco = async (req, res) => {
+
+    const { endereco } = req.params
+
+    try {
+        const cliente = await knex('clientes').where({endereco})
+
+        if(!cliente){
+            return res.status(404).json({mensagem: 'Clientes não encontrados'})
+        }
+
+        return res.status(200).json(cliente)
+
+    }catch (erro){
+        return res.status(400).json(erro.message)
+    }
+
+}
+
+
 module.exports = {
     cadastrarCliente,
-    listarClientes
+    listarClientes,
+    obterClientePorNome,
+    listarClientesPorEndereco
 }
