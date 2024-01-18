@@ -46,8 +46,6 @@ const listarClientes = async (req, res) => {
 
         const clientes = await knex('clientes')
 
-        console.log(clientes)
-
         return res.status(200).json(clientes)
 
     }catch (erro){
@@ -94,10 +92,66 @@ const listarClientesPorEndereco = async (req, res) => {
 
 }
 
+const atualizarCliente = async (req, res) => {
+
+    const { nome, endereco, telefone } = req.body
+    const { id } = req.params
+
+    if(!nome && !endereco && !telefone){
+        return res.status(400).json({mensagem: 'É necessário ao menos um campo para atualizar'})
+    }
+
+    try {
+
+        const clienteExiste = await knex('clientes').where({id}).first()
+
+        if(!clienteExiste){
+            return res.status(404).json({mensagem: 'Cliente não encontrado'})
+        }
+
+        const cliente = await knex('clientes').update({nome, endereco, telefone}).where({id})
+
+        if(!cliente){
+            return res.status(400).json({mensagem: 'Não foi possível atualizar o cliente'})
+        }
+
+        return res.status(200).json({mensagem: 'Cliente atualizado'})
+
+    }catch (erro){
+        return res.status(500).json(erro.message)
+    }
+
+}
+
+const excluirCliente = async (req, res) => {
+    const { id } = req.params
+
+    try{
+        const clienteExistente = await knex('clientes').where({id}).first()
+
+        if(!clienteExistente){
+            return res.status(404).json({mensagem: 'Cliente não encontrado'})
+        }
+
+        const usuario = await knex('clientes').delete().where({id})
+
+        if(!usuario){
+            return res.status(400).json({mensagem: 'Não foi posssível excluir o cliente'})
+        }
+
+        return res.status(200).json({mensagem:'Cliente excluido com sucesso'})
+
+    }catch (erro){
+        return res.status(500).json(erro.message)
+    }
+}
 
 module.exports = {
     cadastrarCliente,
     listarClientes,
     obterClientePorNome,
-    listarClientesPorEndereco
+    listarClientesPorEndereco,
+    atualizarCliente,
+    excluirCliente
+
 }
