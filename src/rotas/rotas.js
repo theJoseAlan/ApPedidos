@@ -32,5 +32,6 @@ rotas.get('/pedido', pedido.listarPedidos)
 rotas.get('/pedido/:cliente_id', pedido.listarPedidosPorCliente)
 rotas.put('/pedido/:id', pedido.atualizarPedido)
 rotas.delete('/pedido/:id', pedido.excluirPedido)
+rotas.delete('/pedido/excluir/:cliente_id', pedido.excluirPedidoPorCliente)
 
 module.exports = rotas

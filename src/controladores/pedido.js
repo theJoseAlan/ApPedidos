@@ -41,15 +41,15 @@ const cadastrarPedido = async (req, res) => {
         const pedido = await knex('pedidos')
             .insert({cliente_id, produto_id, quantidade, nro_parcelas, total}).returning('*')
 
-        const valor_individual = total / nro_parcelas
-
-        const parcelas = await knex('parcelas')
-            .insert({quantidade: nro_parcelas, valor_individual, total})
-            .returning('*')
-
         if(pedido.length === 0){
             return res.status(400).json({mensagem: 'Pedido não cadastrado'})
         }
+
+        const valor_individual = total / nro_parcelas
+
+        const parcelas = await knex('parcelas')
+            .insert({quantidade: nro_parcelas, valor_individual, total, pedido_id: pedido[0].id})
+            .returning('*')
 
         return res.status(200).json([pedido, parcelas])
     }catch (erro){
@@ -195,7 +195,36 @@ const excluirPedido = async (req, res) => {
             return res.status(400).json({mensagem: 'Não foi posssível excluir o cliente'})
         }
 
-        return res.status(200).json({mensagem:'Cliente excluido com sucesso'})
+        return res.status(200).json({mensagem:'Pedido excluido com sucesso'})
+
+    }catch (erro){
+        return res.status(500).json(erro.message)
+    }
+}
+
+const excluirPedidoPorCliente = async (req, res) => {
+    const { cliente_id } = req.params
+
+    try{
+        const clienteExistente = await knex('clientes').where({id: cliente_id})
+
+        if(!clienteExistente){
+            return res.status(404).json({mensagem: 'Cliente não encontrado'})
+        }
+
+        const pedidoExistente = await knex('pedidos').where({cliente_id})
+
+        if(pedidoExistente.length === 0){
+            return res.status(404).json({mensagem: 'Pedidos não encontrados'})
+        }
+
+        const pedido = await knex('pedidos').delete().where({cliente_id})
+
+        if(!pedido){
+            return res.status(400).json({mensagem: 'Não foi posssível excluir o cliente'})
+        }
+
+        return res.status(200).json({mensagem:'Pedidos excluidos com sucesso'})
 
     }catch (erro){
         return res.status(500).json(erro.message)
@@ -207,5 +236,6 @@ module.exports = {
     listarPedidos,
     listarPedidosPorCliente,
     atualizarPedido,
-    excluirPedido
+    excluirPedido,
+    excluirPedidoPorCliente
 }

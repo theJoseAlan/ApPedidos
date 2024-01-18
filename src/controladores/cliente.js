@@ -133,6 +133,12 @@ const excluirCliente = async (req, res) => {
             return res.status(404).json({mensagem: 'Cliente não encontrado'})
         }
 
+        const pedidosDoCliente = await knex('pedidos').where({cliente_id: id}).count()
+
+        if(pedidosDoCliente > 0){
+            return res.status(400).json({mensagem: 'Esse cliente ainda possui pedidos pendentes'})
+        }
+
         const cliente = await knex('clientes').delete().where({id})
 
         if(!cliente){
