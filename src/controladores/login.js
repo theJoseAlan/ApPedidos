@@ -15,14 +15,10 @@ const login = async (req, res) => {
 
         const usuarioEncontrado = await knex('usuario').where({email}).first()
 
-        if(!usuarioEncontrado){
-            return res.status(400).json({mensagem:'O usuario não foi encontrado'});
-        }
-
         const senhaCorreta = await bcrypt.compare(senha, usuarioEncontrado.senha);
 
-        if (!senhaCorreta) {
-            return res.status(400).json("Email e senha não confere");
+        if (!senhaCorreta || !usuarioEncontrado) {
+            return res.status(401).json({mensagem:"Email e senha não confere"});
         }
 
         const token = jwt.sign({id: usuarioEncontrado.id}, senhaHash, {expiresIn: '8h'})

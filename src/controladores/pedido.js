@@ -78,7 +78,28 @@ const listarPedidos = async (req, res) => {
 
         const pedidos = await knex('pedidos')
 
-        return res.status(200).json(pedidos)
+        let arrayPedidos = []
+
+        for(let i = 0; i < pedidos.length; i++){
+
+            const cliente = await knex('clientes').where({id: pedidos[i].cliente_id}).first()
+
+            const produto = await knex('produtos').where({id: pedidos[i].produto_id}).first()
+
+            const pedidosResponse = {
+                codPedido: pedidos[i].id,
+                cliente: cliente.nome,
+                produto: produto.nome,
+                quantidade: pedidos[i].quantidade,
+                parelas: pedidos[i].nro_parcelas,
+                total: pedidos[i].total
+            }
+
+            arrayPedidos.push(pedidosResponse)
+
+        }
+
+        return res.status(200).json(arrayPedidos)
 
     }catch (erro){
         return res.status(400).json(erro.message)
@@ -88,7 +109,7 @@ const listarPedidos = async (req, res) => {
 const listarPedidosPorCliente = async (req, res) => {
 
     const { authorization } = req.headers
-    const { cliente_id } = req.params
+    const { nomeCliente } = req.params
 
     if(!authorization){
         return res.status(401).json({mensagem: 'Não autorizado'})
@@ -105,19 +126,40 @@ const listarPedidosPorCliente = async (req, res) => {
             return res.status(404).json({mensagem: 'Usuario não encontrado' })
         }
 
-        const clienteEncontrado = await knex('clientes').where({id: cliente_id}).first()
+        const clienteEncontrado = await knex('clientes').where({nome: nomeCliente}).first()
 
         if(!clienteEncontrado){
             return res.status(404).json({mensagem: 'Cliente não encontrado'})
         }
 
-        const pedidos = await knex('pedidos').where({cliente_id})
+        const pedidos = await knex('pedidos').where({cliente_id: clienteEncontrado.id})
 
         if(pedidos.length === 0){
             return res.status(200).json({mensagem: 'Esse cliente ainda não fez nenhum pedido'})
         }
 
-        return res.status(200).json(pedidos)
+        let arrayPedidos = []
+
+        for(let i = 0; i < pedidos.length; i++){
+
+            const cliente = await knex('clientes').where({id: pedidos[i].cliente_id}).first()
+
+            const produto = await knex('produtos').where({id: pedidos[i].produto_id}).first()
+
+            const pedidosResponse = {
+                codPedido: pedidos[i].id,
+                cliente: cliente.nome,
+                produto: produto.nome,
+                quantidade: pedidos[i].quantidade,
+                parelas: pedidos[i].nro_parcelas,
+                total: pedidos[i].total
+            }
+
+            arrayPedidos.push(pedidosResponse)
+
+        }
+
+        return res.status(200).json(arrayPedidos)
 
     }catch (erro){
         return res.status(400).json(erro.message)

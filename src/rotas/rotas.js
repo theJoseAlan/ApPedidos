@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { cadastrarUsuario } = require('../controladores/usuario');
+const { cadastrarUsuario, atualizarUsuario } = require('../controladores/usuario');
 const { verificaLogin } = require('../filtros/verificalogin')
 const login = require('../controladores/login')
 const cliente = require('../controladores/cliente')
@@ -13,6 +13,8 @@ rotas.post('/usuario', cadastrarUsuario)
 rotas.post('/login', login.login)
 
 rotas.use(verificaLogin)
+
+rotas.put('/usuario', atualizarUsuario)
 
 rotas.post('/cliente', cliente.cadastrarCliente)
 rotas.get('/cliente', cliente.listarClientes)
@@ -29,7 +31,7 @@ rotas.get('/produto/:nome', produto.obterProdutoPorNome)
 
 rotas.post('/pedido', pedido.cadastrarPedido)
 rotas.get('/pedido', pedido.listarPedidos)
-rotas.get('/pedido/:cliente_id', pedido.listarPedidosPorCliente)
+rotas.get('/pedido/:nomeCliente', pedido.listarPedidosPorCliente)
 rotas.put('/pedido/:id', pedido.atualizarPedido)
 rotas.delete('/pedido/:id', pedido.excluirPedido)
 rotas.delete('/pedido/excluir/:cliente_id', pedido.excluirPedidoPorCliente)
