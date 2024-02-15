@@ -51,7 +51,7 @@ const cadastrarPedido = async (req, res) => {
             .insert({quantidade: nro_parcelas, valor_individual, total, pedido_id: pedido[0].id})
             .returning('*')
 
-        return res.status(200).json([pedido, parcelas])
+        return res.status(200).json({mensagem: 'Pedido cadastrado'})
     }catch (erro){
         return res.status(400).json(erro.message)
     }
@@ -231,10 +231,12 @@ const excluirPedido = async (req, res) => {
             return res.status(404).json({mensagem: 'Pedido não encontrado'})
         }
 
+        const parcela = await knex('parcelas').delete().where({pedido_id: id})
+
         const pedido = await knex('pedidos').delete().where({id})
 
-        if(!pedido){
-            return res.status(400).json({mensagem: 'Não foi posssível excluir o cliente'})
+        if(!pedido || parcela){
+            return res.status(400).json({mensagem: 'Não foi posssível excluir o pedido'})
         }
 
         return res.status(200).json({mensagem:'Pedido excluido com sucesso'})
